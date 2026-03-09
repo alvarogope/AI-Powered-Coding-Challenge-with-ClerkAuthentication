@@ -111,7 +111,7 @@ ai-challenge-platform/
   
 ---
 
-## 💡 What I Learned
+## What I Learned
 
 - Architecting a **full-stack application** with a fully decoupled React frontend and FastAPI backend
 - Building an **AI pipeline** that eliminates static data by generating content dynamically via OpenAI
@@ -124,7 +124,7 @@ ai-challenge-platform/
 
 ---
 
-## 🔮 Future Improvements
+## Future Improvements
 
 - [ ] Deploy to cloud (Railway for backend, Vercel for frontend)
 - [ ] Add a leaderboard to compare scores across users
@@ -134,6 +134,6 @@ ai-challenge-platform/
 
 ---
 
-## 📄 License
+## License
 
 This project is open source and available under the [MIT License](LICENSE).
