@@ -1,106 +1,139 @@
-**PROJECT DESCRIPTION**
+# AI-Integrated Coding Challenge Platform
 
-In this project I developed a Full-Stack AI-Integrate Challenge Platform that generates coding challenges.
-Each challenge is personalized and has a difficulty setting.
-Users can log-into their account where their challenge history will appear.
-The login is protected using Clerk Authentication, that also links the user sessions and the data persistence tracking the challenges.
+A full-stack web application that dynamically generates personalized coding challenges using OpenAI's GPT. Users can select a difficulty level, receive a unique AI-generated programming question, submit their answer, and receive instant feedback — all within a secure, authenticated environment that tracks their full challenge history.
 
 ---
 
-**ABOUT THE PROJECT**
+## Project Overview
 
-By implementing an AI pipeline in the project, I did not need to build a database, as ChatGPT would just geneerate it dynamically. There is asynchronous communication between third-party services and the server that I created, using Clerk and OpenAI, through the webhooks.
+This platform eliminates the need for a static challenge database entirely. Instead of storing pre-written questions, the application uses an **AI pipeline powered by OpenAI** to generate every challenge dynamically based on the user's chosen difficulty. This means no two challenges are ever the same.
 
-In the frontend, I created a directory-based component structure, as well as, implementing the authentication status by protecting the routes at a granular level.
+Authentication is handled end-to-end by **Clerk**, which manages user sessions on both the frontend and backend. When a new user registers, a **webhook** automatically syncs their data between Clerk and the local MySQL database — ensuring user identity, challenge history, and daily quotas stay in perfect sync across the entire stack.
 
----
-
-**TECH STACK:**
-
-*In the backend:*
-
-FastAPI,
-
-Uvicorn to run the FastAPI,
-
-SQLAlchemy,
-
-Python-Dotenv for managing the environment variables.
-  
-*In the frontend:*
-
-React (Vite) for the User Interface,
-
-Clerk React SDK that manages the authentication and the UI for sign-in/sign-up,
-
-Tailwind CSS for the layout.
+On the frontend, routes are protected at a **granular level** using Clerk's `<SignedIn>` and `<SignedOut>` components, meaning unauthenticated users are blocked from accessing any part of the app beyond the login page.
 
 ---
 
-**FEATURES & SECURITY:**
+## Tech Stack
 
-Full-Stack Auth - Session managed using Clerk on client and server.
-  
-Database - The data storage for the number of challenges, the difficulty chose, the answer given and the correction.
-  
-The API keys that were stored in the .env files were excluded from version control in PyCharm using the .gitignore
-  
-CORSMiddleware - By using this I ensured that the API only accepts the requests from the frontend domains.
+### Backend
+| Tool | Purpose |
+|------|---------|
+| **FastAPI** | High-performance Python framework for building the REST API |
+| **Uvicorn** | ASGI server that runs the FastAPI application |
+| **SQLAlchemy** | ORM for defining and interacting with the database using Python instead of raw SQL |
+| **MySQL** | Relational database storing challenge attempts, difficulty settings, answers, and corrections |
+| **OpenAI API (GPT)** | AI engine that dynamically generates coding questions and explanations |
+| **Clerk (Backend)** | JWT token verification to authenticate every incoming API request |
+| **Python-Dotenv** | Secure management of environment variables |
+| **UV** | Fast Python package manager used instead of pip to manage all dependencies |
+| **NGROK** | Tunnels Clerk webhooks to the local development server during development |
 
----
-
-**PROJECT FILES EXPLANATION:**
-
-*BACKEND:*
-
-ai_generator.py - Contains the logic to communicate with OpenAI API to generate the challenges
-
-webhooks.py - sync file with Clerk Authentication keeping it linked
-
-challenge.py - Handles the challenges like the answers and the difficulty setting.
-
-app.py - Used as the main
-
-utils.py - Contains reusable code bits
-
-server.py - This is the entry point of the API and enables CORSMiddleware, integrates Clerk, and connects with React from the Frontend
-
-models.py - It uses SQLAlchemy ORM to define the challenges
-
-database.py - Connects python code to the SQL database
-
-.env - Contains the Clerk Security Key. This file was excluded from GitHub for security reasons.
-
-pyproject.toml - Here I list the libraries required to run the backend.
-
-*FRONTEND:*
-
-ClerkProviderWithRoutes.jsx - Protects the navigation by wrapping it.
-
-AuthenticationPage.jsx - UI for login and sign-up
-
-ChallengeGenerator.jsx - Interface where users interact wih the challenge
-
-MCQChallenge.jsx - Displays the Multiple Choice Questions
-
-HistoryPanel.jsx - Shows the user's past attemps and challenges
-
-Layout.jsx - Contains the navigation bar and footer through the different pages
-
-api.js - Fetch configuration that make requests to server.py
-  
-main.jsx - Wraps the entire app in the ClerkProvider
-  
-App.jsx - I use the Clerk UI components using the <SignedIn> and <SignedOut>
+### Frontend
+| Tool | Purpose |
+|------|---------|
+| **React + Vite** | High-performance, component-based user interface |
+| **React Router DOM** | Client-side navigation between pages without full browser reloads |
+| **Clerk React SDK** | Manages authentication state globally and provides pre-built sign-in/sign-up UI |
+| **Tailwind CSS** | Modern, responsive layout and styling |
 
 ---
 
-**CHALLENGES PROGRESS AND EVOLUTION:**
+## Features & Security
 
-Firstly, for setting up the environment, I used uv for installing libraries like Clerk and SQLAlchemy, and making it  align to the Python Interpreter in PyCharm.
+** AI-Generated Challenges**
+Challenges are never hard-coded. Every question is generated in real time by OpenAI's GPT based on the user's chosen difficulty, making each session unique.
 
-For Clerk I splitted the credentials, using the Publishable Key in the frontend and keeping the Secret Key in the backend.
+** Full-Stack Authentication**
+Clerk manages the entire authentication flow — sign-up, login, Google Social Auth, and session management. The frontend splits Clerk credentials intentionally: the **Publishable Key** is used in React for the UI, while the **Secret Key** is kept exclusively in the backend `.env` file for JWT validation.
 
-In the backend logic, I experienced failing in Uvicorn, because it was looking for main.py instead of the name of my file: server.py.
+** Webhook Synchronisation**
+When a new user registers through Clerk, a webhook automatically fires and syncs the user's data to the local database. This keeps Clerk and the backend in real-time alignment without any manual intervention.
 
-Finally, I added to the .gitignore file all the data is not going to leak on GitHub.
+** Route Protection**
+Frontend routes are protected at a granular level using Clerk's `<SignedIn>` and `<SignedOut>` components. Unauthenticated users cannot access the challenge generator or history panel.
+
+** Daily Challenge Quota**
+The database tracks how many challenges each user has generated per day, enforcing server-side limits to prevent API abuse.
+
+** CORS Middleware**
+Configured on the backend to ensure the API exclusively accepts requests from the authorized frontend domain, blocking any unauthorized cross-origin access.
+
+** Environment Security**
+All sensitive credentials (OpenAI API key, Clerk Secret Key, database URL) are stored in `.env` files, which are explicitly excluded from version control via `.gitignore`.
+
+---
+
+## Project Structure
+
+```
+ai-challenge-platform/
+│
+├── backend/
+│   ├── ai_generator.py       # OpenAI API logic — generates challenges dynamically
+│   ├── webhooks.py           # Syncs Clerk user data with the local database in real time
+│   ├── challenge.py          # Handles challenge logic — answers, difficulty, corrections
+│   ├── models.py             # SQLAlchemy ORM models defining the database schema
+│   ├── database.py           # Connects Python to the MySQL database
+│   ├── utils.py              # Reusable helper functions shared across the backend
+│   ├── server.py             # API entry point — enables CORS, integrates Clerk, connects to React
+│   ├── app.py                # Main FastAPI application instance
+│   ├── .env                  # Secret keys (excluded from GitHub via .gitignore)
+│   └── pyproject.toml        # Lists all backend libraries and dependencies
+│
+├── frontend/
+│   ├── src/
+│   │   ├── main.jsx                      # Wraps the entire app in ClerkProvider
+│   │   ├── App.jsx                       # Uses <SignedIn> / <SignedOut> for route protection
+│   │   ├── ClerkProviderWithRoutes.jsx   # Protects navigation by wrapping React Router
+│   │   ├── AuthenticationPage.jsx        # Login and sign-up UI
+│   │   ├── ChallengeGenerator.jsx        # Main interface where users interact with challenges
+│   │   ├── MCQChallenge.jsx              # Renders Multiple Choice Question challenges
+│   │   ├── HistoryPanel.jsx              # Displays the user's past attempts and results
+│   │   ├── Layout.jsx                    # Shared navigation bar and footer across all pages
+│   │   └── api.js                        # Fetch configuration for all requests to server.py
+│   └── vite.config.js
+│
+├── .gitignore                # Excludes .env, .venv, node_modules from version control
+└── README.md
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+- Python 3.10+
+- Node.js 18+
+- MySQL database
+- Clerk account — [clerk.com](https://clerk.com)
+- OpenAI API key — [platform.openai.com](https://platform.openai.com)
+  
+---
+
+## 💡 What I Learned
+
+- Architecting a **full-stack application** with a fully decoupled React frontend and FastAPI backend
+- Building an **AI pipeline** that eliminates static data by generating content dynamically via OpenAI
+- Implementing **JWT-based authentication** across both client and server using Clerk
+- Setting up **webhooks** for real-time asynchronous communication between third-party services and a local server
+- Using **SQLAlchemy ORM** to model and query relational data without writing raw SQL
+- Protecting **frontend routes at a granular level** using Clerk's authentication components
+- Splitting **API credentials by responsibility** — public key on the frontend, secret key on the backend
+- Applying professional **environment security practices** with `.env` files and `.gitignore`
+
+---
+
+## 🔮 Future Improvements
+
+- [ ] Deploy to cloud (Railway for backend, Vercel for frontend)
+- [ ] Add a leaderboard to compare scores across users
+- [ ] Support multiple programming languages per challenge
+- [ ] Difficulty progression system based on user performance over time
+- [ ] Export challenge history as a PDF report
+
+---
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
