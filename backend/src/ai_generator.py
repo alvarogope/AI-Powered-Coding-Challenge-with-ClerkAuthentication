@@ -28,7 +28,7 @@ def generate_challenge_with_ai(difficulty: str) -> Dict[str, Any]:
         Make sure the options are plausible but with only one clearly correct answer.
         """
     try:
-        response = client.chat.completions .create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo-16k",
             messages=[
                 {"role": "system", "content": system_prompt},
