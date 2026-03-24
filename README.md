@@ -11,12 +11,6 @@ A full-stack AI-powered coding challenge platform. Users log in, select a diffic
  
 ---
  
-## 📸 Preview
- 
-![App Preview](assets/preview.png)
- 
----
- 
 ## ✨ Features
  
 - 🤖 **AI-Generated Challenges** — GPT produces unique coding questions on every request, eliminating the need for a static challenge database
