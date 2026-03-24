@@ -1,6 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, create_engine
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker
 from datetime import datetime
 
 engine = create_engine('sqlite:///database.db', echo=True)
@@ -24,7 +23,7 @@ class ChallengeQuota(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(String, nullable=False, unique=True)
-    quota_remaining = Column(Integer, nullable=False, default=40)
+    quota_remaining = Column(Integer, nullable=False, default=15)
     last_reset_date = Column(DateTime, default=datetime.now)
 
 
