@@ -24,46 +24,42 @@ class ChallengeRequest(BaseModel):
 
 @router.post("/generate-challenge")
 async def generate_challenge(request: ChallengeRequest, request_obj: Request, db: Session = Depends(get_db)):
-    try:
-        user_details = authenticate_and_get_user_details(request_obj)
-        user_id = user_details.get('userid')
+    user_details = authenticate_and_get_user_details(request_obj)
+    user_id = user_details.get('userid')
 
-        quota = get_challenge_quota(db, user_id)
-        if not quota:
-            quota = create_challenge_quota(db, user_id)
+    quota = get_challenge_quota(db, user_id)
+    if not quota:
+        quota = create_challenge_quota(db, user_id)
 
-        quota = reset_quota_if_needed(db, quota)
+    quota = reset_quota_if_needed(db, quota)
 
-        if quota.quota_remaining <= 0:
-            raise HTTPException(status_code=429, detail="Quota exceeded")
+    if quota.quota_remaining <= 0:
+        raise HTTPException(status_code=429, detail="Quota exceeded")
 
-        challenge_data = generate_challenge_with_ai(request.difficulty)
+    challenge_data = generate_challenge_with_ai(request.difficulty)
 
-        new_challenge = create_challenge(
-            db=db,
-            difficulty=request.difficulty,
-            created_by=user_id,
-            challenge_title=challenge_data["title"],
-            options=json.dumps(challenge_data["options"]),
-            correct_answer=challenge_data["correct_answer_id"],
-            explanation=challenge_data["explanation"]
-        )
+    new_challenge = create_challenge(
+        db=db,
+        difficulty=request.difficulty,
+        created_by=user_id,
+        challenge_title=challenge_data["title"],
+        options=json.dumps(challenge_data["options"]),
+        correct_answer=challenge_data["correct_answer_id"],
+        explanation=challenge_data["explanation"]
+    )
 
-        quota.quota_remaining -= 1
-        db.commit()
+    quota.quota_remaining -= 1
+    db.commit()
 
-        return {
-            "id": new_challenge.id,
-            "difficulty": request.difficulty,
-            "title": new_challenge.title,
-            "options": json.loads(new_challenge.options),
-            "correct_answer_id": new_challenge.correct_answer_id,
-            "explanation": new_challenge.explanation,
-            "timestamp": new_challenge.date_created.isoformat(),
-        }
-
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    return {
+        "id": new_challenge.id,
+        "difficulty": request.difficulty,
+        "title": new_challenge.title,
+        "options": json.loads(new_challenge.options),
+        "correct_answer_id": new_challenge.correct_answer_id,
+        "explanation": new_challenge.explanation,
+        "timestamp": new_challenge.date_created.isoformat(),
+    }
 
 @router.get("/my-history")
 async def my_history(request: Request, db: Session = Depends(get_db)):
@@ -71,7 +67,20 @@ async def my_history(request: Request, db: Session = Depends(get_db)):
     user_id = user_details.get('userid')
 
     challenges = get_user_challenges(db, user_id)
-    return {"challenges": challenges}
+    return {
+        "challenges": [
+            {
+                "id": c.id,
+                "difficulty": c.difficulty,
+                "title": c.title,
+                "options": json.loads(c.options),
+                "correct_answer_id": c.correct_answer_id,
+                "explanation": c.explanation,
+                "timestamp": c.date_created.isoformat(),
+            }
+            for c in challenges
+        ]
+    }
 
 @router.get("/quota")
 async def get_quota(request: Request, db: Session = Depends(get_db)):
@@ -83,7 +92,11 @@ async def get_quota(request: Request, db: Session = Depends(get_db)):
         return {
             "user_id": user_id,
             "quota_remaining": 0,
-            "last_reset_date": datetime.now(),
+            "last_reset_date": datetime.now().isoformat(),
         }
     quota = reset_quota_if_needed(db, quota)
-    return quota
+    return {
+        "user_id": quota.user_id,
+        "quota_remaining": quota.quota_remaining,
+        "last_reset_date": quota.last_reset_date.isoformat(),
+    }
