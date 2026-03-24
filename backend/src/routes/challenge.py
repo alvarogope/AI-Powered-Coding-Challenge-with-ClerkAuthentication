@@ -34,7 +34,7 @@ async def generate_challenge(request: ChallengeRequest, request_obj: Request, db
 
         quota = reset_quota_if_needed(db, quota)
 
-        if quota.remaining_quota <= 0:
+        if quota.quota_remaining <= 0:
             raise HTTPException(status_code=429, detail="Quota exceeded")
 
         challenge_data = generate_challenge_with_ai(request.difficulty)
