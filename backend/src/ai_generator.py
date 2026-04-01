@@ -4,7 +4,7 @@ from openai import OpenAI
 from typing import Dict, Any
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -29,7 +29,7 @@ def generate_challenge_with_ai(difficulty: str) -> Dict[str, Any]:
         """
     try:
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo-16k",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": f"Generate a {difficulty} difficulty coding challenge."}
@@ -49,15 +49,4 @@ def generate_challenge_with_ai(difficulty: str) -> Dict[str, Any]:
         return challenge_data
 
     except Exception as e:
-        print(e)
-        return {
-            "title": "Basic Python List Operation",
-            "options": [
-                "my_list.append(5)",
-                "my_list.add(5)",
-                "my_list.push(5)",
-                "my_list.insert(5)",
-            ],
-            "correct_answer_id": 0,
-            "explanation": "In Python, append() is the correct method to add an element to the end of a list."
-        }
+        raise e
