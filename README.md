@@ -22,6 +22,19 @@ A full-stack AI-powered coding challenge platform. Users log in, select a diffic
 
 ---
 
+## 📸 Preview
+
+### Sign In
+![Sign In](assets/sign-in.png)
+
+### Generate a Challenge
+![Challenge Generator](assets/preview.png)
+
+### Challenge History
+![History](assets/history.png)
+
+---
+
 ## 🏗️ Architecture
  
 ```
