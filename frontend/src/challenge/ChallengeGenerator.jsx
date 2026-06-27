@@ -27,6 +27,7 @@ export function ChallengeGenerator() {
     const generateChallenge = async () => {
         setIsLoading(true)
         setError(null)
+        setChallenge(null)
 
         try {
             const data = await makeRequest("generate-challenge", {
@@ -85,6 +86,6 @@ export function ChallengeGenerator() {
             <p>{error}</p>
         </div>}
 
-        {challenge && <MCQChallenge challenge={challenge} />}
+        {challenge && <MCQChallenge key={challenge.id} challenge={challenge} />}
     </div>
 }

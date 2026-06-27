@@ -3,7 +3,9 @@ from clerk_backend_api import Clerk, AuthenticateRequestOptions
 import os
 from dotenv import load_dotenv
 
-load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
+_backend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+load_dotenv(os.path.join(_backend_dir, ".env"))
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 clerk_sdk = Clerk(bearer_auth=os.getenv("CLERK_SECRET_KEY"))
 
